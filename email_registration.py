@@ -1,38 +1,14 @@
 import re
-import json
 from authorization import user_authorization
+from read_file import get_users_database, get_denied_users
+from put_in_file import dump_emails_to_file, dump_denied_users_to_file
+import numpy as np
+
 
 _users_path = 'users_email.json'
 _denied_users_path = 'denied_users_email.json'
 
-# ======= Load user info and denied users ==========
-def get_users_database(path):
-    try:
-        with open(path, 'r') as f:
-            try:
-                _USERS = json.load(f)
-            except json.decoder.JSONDecodeError:
-                _USERS = {}
-    except FileNotFoundError:
-        _USERS = {}
-    return _USERS
-
-def get_denied_users(path):
-    try:
-        with open(path, 'r') as f:
-            try:
-                denied_emails = json.load(f)
-            except json.decoder.JSONDecodeError:
-                denied_emails = set()
-    except FileNotFoundError:
-        denied_emails = set()
-
-    if isinstance(denied_emails, set):
-        return denied_emails
-
-    return set(denied_emails.keys())
-
-
+_USERS = get_users_database(_users_path)
 denied_users = get_denied_users(_denied_users_path)
 
 
@@ -75,17 +51,6 @@ def user_registration(users: dict):
         else:
             print('Invalid name of email!')
             continue
-
-#======== Dump data to the database simulation ===========
-def dump_emails_to_file(data, path):
-    with open(path, 'w') as f:
-        json.dump(data, f)
-
-
-def dump_denied_users_to_file(data, path):
-    denied_dict = dict.fromkeys(data, 'Denied')
-    with open(path, 'w') as f:
-        json.dump(denied_dict, f)
 
 
 def main():
