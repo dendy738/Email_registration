@@ -2,7 +2,6 @@ import re
 from authorization import user_authorization
 from read_file import get_users_database, get_denied_users
 from put_in_file import dump_emails_to_file, dump_denied_users_to_file
-import numpy as np
 from random_password import password_generator
 
 _users_path = 'users_email.json'
@@ -26,11 +25,12 @@ def user_registration(users: dict):
     while True:
         user_email = input('Email (must start with a lowercase letter and email can consist lower letters, digits, "."):\n')
         if re.match(email_pattern, user_email):
+            if user_email in denied_users:
+                print('You have been denied!')
+                return users
+
             is_exist = check_email(user_email, users)
             if is_exist:
-                if user_email in denied_users:
-                    return 'You have been denied!'
-
                 response = user_authorization(users, user_email)
                 if response['is_success']:
                     print('Authorization successful!')
@@ -49,19 +49,19 @@ def user_registration(users: dict):
                         continue
                     else:
                         users[user_email] = user_password
-                        break
+                        return users
                 elif choice[0] == 'N':
                     password_length = int(input('Enter password length (8-18): '))
                     if password_length < 8 or password_length > 18:
                         rand_pass = password_generator()
                         print(f'Your password: {rand_pass}')
                         users[user_email] = rand_pass
-                        break
+                        return users
                     else:
                         rand_pass = password_generator(password_length)
                         print(f'Your password: {rand_pass}')
                         users[user_email] = rand_pass
-                        break
+                        return users
                 else:
                     print('Please only choice from Yes/No.')
                     continue
