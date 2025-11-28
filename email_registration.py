@@ -1,6 +1,6 @@
 import re
 import json
-
+from random_password import password_generator
 
 _users_path = 'users_email.json'
 
@@ -27,13 +27,30 @@ def input_user_info(users: dict):
             if is_exist:
                 print('Email already registered.')
             else:
-                user_password = input('Password (may consist lower letters, digits, symbols - (".+-_"):\n')
-                if re.search(pass_pattern, user_password):
-                    print('Password contain forbidden characters.')
-                    continue
+                choice = input('Do you want to create your own password? (Yes/No): ')
+                if choice[0] == 'Y':
+                    user_password = input('Password (may consist letters, digits, symbols - (.+-_):\n')
+                    if re.search(pass_pattern, user_password):
+                        print('Password contain forbidden characters.')
+                        continue
+                    else:
+                        users[user_email] = user_password
+                        break
+                elif choice[0] == 'N':
+                    password_length = int(input('Enter password length (8-18): '))
+                    if password_length < 8 or password_length > 18:
+                        rand_pass = password_generator()
+                        print(f'Your password: {rand_pass}')
+                        users[user_email] = rand_pass
+                        break
+                    else:
+                        rand_pass = password_generator(password_length)
+                        print(f'Your password: {rand_pass}')
+                        users[user_email] = rand_pass
+                        break
                 else:
-                    users[user_email] = user_password
-                    break
+                    print('Please only choice from Yes/No.')
+                    continue
         else:
             print('Invalid name of email or such email is not exist!')
             continue
