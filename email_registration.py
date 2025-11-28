@@ -3,7 +3,7 @@ from authorization import user_authorization
 from read_file import get_users_database, get_denied_users
 from put_in_file import dump_emails_to_file, dump_denied_users_to_file
 import numpy as np
-
+from random_password import password_generator
 
 _users_path = 'users_email.json'
 _denied_users_path = 'denied_users_email.json'
@@ -41,13 +41,30 @@ def user_registration(users: dict):
                     denied_users.add(user_email)
                     return users
             else:
-                user_password = input('Password (may consist lower letters, digits, symbols - (".+-_"):\n')
-                if re.search(pass_pattern, user_password):
-                    print('Password contain forbidden characters.')
-                    continue
+                choice = input('Do you want to create your own password? (Yes/No): ')
+                if choice[0] == 'Y':
+                    user_password = input('Password (may consist letters, digits, symbols - (.+-_):\n')
+                    if re.search(pass_pattern, user_password):
+                        print('Password contain forbidden characters.')
+                        continue
+                    else:
+                        users[user_email] = user_password
+                        break
+                elif choice[0] == 'N':
+                    password_length = int(input('Enter password length (8-18): '))
+                    if password_length < 8 or password_length > 18:
+                        rand_pass = password_generator()
+                        print(f'Your password: {rand_pass}')
+                        users[user_email] = rand_pass
+                        break
+                    else:
+                        rand_pass = password_generator(password_length)
+                        print(f'Your password: {rand_pass}')
+                        users[user_email] = rand_pass
+                        break
                 else:
-                    users[user_email] = user_password
-                    return users
+                    print('Please only choice from Yes/No.')
+                    continue
         else:
             print('Invalid name of email!')
             continue
